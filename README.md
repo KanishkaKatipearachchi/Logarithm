@@ -1,1 +1,1 @@
-Logaritm
+# Logarithm
