@@ -13,23 +13,22 @@ import matplotlib.pyplot as plt
 
 class Interval():
     """
-    A class representing a closed interval of real numbers
+    A class representing a closed interval of real numbers.
+    This class can undergo arithmetic operations with other intervals,
+    and of real numbers, where a real number n is represented as [n, n].
     """
     def __init__(self, *args):
         """
-        TODO: add proper assertions/exception throws 
-        such that the arguments can only be floats or an Inverval
+        Initializes an interval
+        Given one numeric parameter
         """
         left = args[0]
         if len(args) > 1:
             right = args[1]
         else:
             right = args[0]
-        try:
-            left = float(left)
-            right = float(right)
-        except:
-            raise ValueError("arguments must be castable to type float")
+        if not is_number(left) or not is_number(right):
+            raise ValueError("arguments must be numbers")
         if left <= right:
             self.left = left
             self.right = right
@@ -38,44 +37,58 @@ class Interval():
             self.left = right
 
     def __add__(self, other):
+        """
+        Adds this interval to another interval
+        """
         other = as_interval(other)
         return Interval(self.left + other.left, self.right + other.right)
 
     def __radd__(self, other):
+        """
+        The reverse order of the add method
+        Addition of intervals is commutative
+        """
         return self + other
 
     def __sub__(self, other):
+        """
+        Subtracts another interval from this interval
+        """
         other = as_interval(other)
         return Interval(self.left - other.right, self.right - other.left)
     
     def __rsub__(self, other):
+        """
+        Subtracts this interval from another interval
+        """
         return as_interval(other) - self
 
     def __mul__(self, other):
+        """
+        Multiplies this interval with another interval
+        """
         other = as_interval(other)
-        """
-        TODO: try to clean this up? Make it more compressed?
-        Is it true that for all real numbers that the product of the rights is greater than any other of the products?
-        """
-        return Interval(min([self.left * other.left, self.left * other.right, self.right * other.left, self.right * other.right]),
-                max([self.left * other.left, self.left * other.right, self.right * other.left, self.right * other.right]))
+        combinations = [self.left * other.left, self.left * other.right, self.right * other.left, self.right * other.right]
+        return Interval(min(combinations), max(combinations))
 
     def __rmul__(self, other):
+        """
+        Multiplies another interval with this interval
+        Multiplication commutes
+        """
         return self * other
 
     def __div__(self, other):
+        """
+        Divides this interval by another interval
+        """
         other = as_interval(other)
-        """
-        TODO: same as mul; 
-        Also, better way to handle div by zero errors?
-        """
-        return Interval(min([self.left / other.left, self.left / other.right, self.right / other.left, self.right / other.right]),
-                max([self.left / other.left, self.left / other.right, self.right / other.left, self.right / other.right]))
+        combinations = [self.left / other.left, self.left / other.right, self.right / other.left, self.right / other.right]
+        return Interval(min(combinations), max(combinations))
 
     def __pow__(self, power):
         """
-        TODO: The definition is a bit odd;
-        It looks as though it can only be defined for integer powers
+        Takes this interval to an integer power
         """
         if type(power) != int:
             raise ValueError("power must be an integer")
@@ -96,24 +109,31 @@ class Interval():
 
 def as_interval(x):
     """
-    Returns x, inputted as either a number or an interval, as an interval
-    If x is an interval the function returns x
+    Returns x, inputted as either a number or an interval, as an interval.
+    If x is an interval the function returns just x. 
     """
     if isinstance(x, Interval):
         return x
-    return Interval(float(x))
+    return Interval(x)
 
 def p(i):
     """
-    The interval polynomial defined in the problem description
+    The interval polynomial defined in the problem description.
+    Returns an interval resulting from the interval parameter.
     """
     return 3 * i**3 - 2 * i**2 - 5 * i - 1
+
+def is_number(x):
+    """
+    Given a data value, returns True if it is of type float or int, False otherwise.
+    """
+    return isinstance(x, int) or isinstance(x, float)
 
 
 def main():
     """
     Main function;
-    For testing purposes only
+    For testing and demonstrative purposes.
     """
     i1 = Interval(1, 4)
     print(i1)
@@ -139,8 +159,10 @@ def main():
     y_lower = [i.left for i in y_intervals]
     y_upper = [i.right for i in y_intervals]
 
-    print(y_lower)
-    print(y_upper)
+    plt.xlabel("x")
+    plt.ylabel("p(I)")
+
+    plt.title("$p(I) = 3I^3 - 2I^2 - 5I - 1$, I = Interval(x, x + 0.5)")
 
     plt.plot(x, y_lower)
     plt.plot(x, y_upper)
