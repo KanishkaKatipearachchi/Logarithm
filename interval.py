@@ -46,7 +46,7 @@ class Interval():
 
     def __sub__(self, other):
         other = as_interval(other)
-        return Interval(self.left - other.left, self.right - other.right)
+        return Interval(self.left - other.right, self.right - other.left)
     
     def __rsub__(self, other):
         return as_interval(other) - self
@@ -138,6 +138,9 @@ def main():
     y_intervals = [p(Interval(x[i], x[i] + 0.5)) for i in range(len(x))]
     y_lower = [i.left for i in y_intervals]
     y_upper = [i.right for i in y_intervals]
+
+    print(y_lower)
+    print(y_upper)
 
     plt.plot(x, y_lower)
     plt.plot(x, y_upper)
